@@ -22,8 +22,8 @@
     --red-dim: rgba(224, 85, 85, 0.15);
     --yellow: #e0c955;
     --text-primary: #f0f5f1;
-    --text-secondary: #94a898;
-    --text-dim: #5a6d5e;
+    --text-secondary: #a8b8ac;
+    --text-dim: #7a8d7e;
     --bolt-green: #34d186;
     --glovo-yellow: #ffc244;
     --wolt-blue: #009de0;
@@ -37,25 +37,15 @@
     min-height: 100vh;
   }
 
-  .noise {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
-    pointer-events: none;
-    z-index: 0;
-  }
-
   .orb {
     position: fixed;
     border-radius: 50%;
-    filter: blur(120px);
-    opacity: 0.15;
+    filter: blur(150px);
+    opacity: 0.08;
     pointer-events: none;
     z-index: 0;
   }
-  .orb-1 { width: 600px; height: 600px; background: #0d4a25; top: -200px; left: -100px; }
-  .orb-2 { width: 500px; height: 500px; background: #0d3a3a; bottom: 200px; right: -100px; }
-  .orb-3 { width: 400px; height: 400px; background: #1a4a20; top: 50%; left: 40%; }
+  .orb-1 { width: 500px; height: 500px; background: #0d4a25; top: -200px; left: -100px; }
 
   .container {
     max-width: 1280px;
@@ -88,14 +78,10 @@
     font-weight: 800;
     line-height: 1.15;
     margin-bottom: 12px;
-    background: linear-gradient(135deg, #fff 0%, #94a898 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: #fff;
   }
   .header h1 span {
-    background: linear-gradient(135deg, var(--green-primary) 0%, #2a7d48 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: var(--green-primary);
   }
   .header .subtitle {
     font-size: 18px;
@@ -274,17 +260,23 @@
   .factor-card {
     background: var(--card);
     border: 1px solid var(--card-border);
-    border-radius: 14px;
-    padding: 24px;
+    border-left: 3px solid var(--red);
+    border-radius: 2px 14px 14px 2px;
+    padding: 24px 24px 24px 20px;
     transition: all 0.2s;
   }
   .factor-card:hover {
     border-color: var(--red);
+    border-left-color: var(--red);
     background: var(--red-dim);
   }
-  .factor-icon {
-    font-size: 28px;
-    margin-bottom: 12px;
+  .factor-number {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--red);
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+    font-variant-numeric: tabular-nums;
   }
   .factor-title {
     font-size: 16px;
@@ -400,33 +392,44 @@
     text-decoration: none;
   }
 
-  /* TAB FILTER */
-  .tab-bar {
+  /* STICKY NAV */
+  .section-nav {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: rgba(10, 15, 10, 0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--card-border);
+    padding: 12px 0;
+    margin: 0 -24px 32px;
+    padding-left: 24px;
+    padding-right: 24px;
     display: flex;
-    gap: 8px;
-    margin-bottom: 24px;
+    gap: 6px;
     flex-wrap: wrap;
   }
-  .tab-btn {
-    background: var(--card);
-    border: 1px solid var(--card-border);
-    color: var(--text-secondary);
+  .nav-link {
+    background: none;
+    border: 1px solid transparent;
+    color: var(--text-dim);
     font-family: 'Inter', sans-serif;
     font-size: 13px;
-    font-weight: 600;
-    padding: 8px 18px;
-    border-radius: 100px;
+    font-weight: 500;
+    padding: 6px 14px;
+    border-radius: 6px;
     cursor: pointer;
     transition: all 0.2s;
+    text-decoration: none;
   }
-  .tab-btn:hover {
-    border-color: var(--green-dim);
+  .nav-link:hover {
     color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.04);
   }
-  .tab-btn.active {
-    background: rgba(70, 210, 122, 0.12);
-    border-color: var(--green-primary);
+  .nav-link.active {
     color: var(--green-primary);
+    background: rgba(70, 210, 122, 0.08);
+    border-color: rgba(70, 210, 122, 0.2);
   }
 
   @media (max-width: 768px) {
@@ -440,10 +443,7 @@
 </head>
 <body>
 
-<div class="noise"></div>
 <div class="orb orb-1"></div>
-<div class="orb orb-2"></div>
-<div class="orb orb-3"></div>
 
 <div class="container">
 
@@ -478,6 +478,15 @@
       <div class="kpi-sublabel">Market leader in ride-hailing</div>
     </div>
   </div>
+
+  <!-- SECTION NAV -->
+  <nav class="section-nav" id="sectionNav">
+    <a href="#section-revenue" class="nav-link active">Revenue</a>
+    <a href="#section-ecosystem" class="nav-link">Ecosystem</a>
+    <a href="#section-timeline" class="nav-link">Timeline</a>
+    <a href="#section-failure" class="nav-link">Why It Failed</a>
+    <a href="#section-profitability" class="nav-link">Profitability</a>
+  </nav>
 
   <!-- SECTION 1: REVENUE COMPARISON -->
   <div class="section" id="section-revenue">
@@ -625,25 +634,25 @@
 
     <div class="factor-grid">
       <div class="factor-card">
-        <div class="factor-icon">&#128200;</div>
+        <div class="factor-number">01</div>
         <div class="factor-title">Late Mover in a 3-Player Market</div>
         <div class="factor-desc">Entered in 2020, two years after Wolt and one year after Glovo. By the time Bolt Food launched, competitors had locked in restaurant partnerships and delivery networks. Croatia's 3.8M population couldn't sustain three platforms.</div>
         <div class="factor-stat">2 years late to market</div>
       </div>
       <div class="factor-card">
-        <div class="factor-icon">&#128176;</div>
+        <div class="factor-number">02</div>
         <div class="factor-title">Unsustainable Customer Acquisition</div>
         <div class="factor-desc">Aggressive discounts and loyalty programs to win users from Glovo/Wolt burned through capital. Price-sensitive Croatian consumers would switch platforms for the best deal, making retention nearly impossible.</div>
         <div class="factor-stat">Revenue halved 2022&rarr;2023</div>
       </div>
       <div class="factor-card">
-        <div class="factor-icon">&#127869;</div>
+        <div class="factor-number">03</div>
         <div class="factor-title">Thin Restaurant Density</div>
         <div class="factor-desc">Glovo and Wolt had exclusive partnerships with top restaurants. Bolt Food's catalog was thinner, especially outside Zagreb. Fewer choices meant fewer orders, creating a death spiral of declining merchant interest.</div>
         <div class="factor-stat">Only 3 cities vs competitors' broader reach</div>
       </div>
       <div class="factor-card">
-        <div class="factor-icon">&#9989;</div>
+        <div class="factor-number">04</div>
         <div class="factor-title">Profitable But Strategically Irrelevant</div>
         <div class="factor-desc">The paradox: Bolt Food was the ONLY profitable delivery platform in Croatia (&euro;118K in 2024). But 7% market share with no growth path made it a distraction from Bolt's core ride-hailing business which generates &euro;1.6B+ globally.</div>
         <div class="factor-stat">&euro;121K profit on &euro;2.73M revenue</div>
@@ -652,7 +661,7 @@
   </div>
 
   <!-- PROFITABILITY CHART -->
-  <div class="section">
+  <div class="section" id="section-profitability">
     <div class="chart-grid">
       <div class="chart-card">
         <h3>Bolt Food Croatia: Revenue vs Profit (&euro;)</h3>
@@ -880,6 +889,36 @@
       }
     }
   });
+
+  // SCROLL SPY
+  const navLinks = document.querySelectorAll('.nav-link');
+  const sections = document.querySelectorAll('.section[id]');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navLinks.forEach(l => l.classList.remove('active'));
+        const active = document.querySelector(`.nav-link[href="#${entry.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -60% 0px' });
+  sections.forEach(s => observer.observe(s));
+
+  // Smooth scroll
+  navLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      const target = document.querySelector(link.getAttribute('href'));
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+
+  // Aria labels for accessibility
+  document.getElementById('revenueChart').setAttribute('aria-label', 'Bar chart: Croatia food delivery revenue 2022-2024. Glovo leads at €22.3M, Wolt €14.2M, Bolt Food €2.7M.');
+  document.getElementById('marketShareChart').setAttribute('aria-label', 'Doughnut chart: 2024 market share. Glovo 57%, Wolt 36%, Bolt Food 7%.');
+  document.getElementById('ecosystemChart').setAttribute('aria-label', 'Bar chart: Bolt global revenue. Rides €1.6B, Food €185M, Scooters €150M.');
+  document.getElementById('profitChart').setAttribute('aria-label', 'Combined chart: Bolt Food revenue declining from €4.5M to €2.7M, profit steady at €93-177K.');
+  document.getElementById('profitabilityChart').setAttribute('aria-label', 'Bar chart: 2024 profit. Bolt Food +€121K, Wolt +€420K, Glovo -€7.4M loss.');
 
   // 5. PROFITABILITY COMPARISON
   new Chart(document.getElementById('profitabilityChart'), {
