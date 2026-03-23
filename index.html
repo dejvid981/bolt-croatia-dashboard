@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bolt Food Croatia: Anatomy of an Exit | David Mustac</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0a0f0a;
+    --card: #111a13;
+    --card-border: #1e3322;
+    --card-hover: #162019;
+    --green-primary: #46d27a;
+    --green-dim: #2a7d48;
+    --green-glow: rgba(70, 210, 122, 0.08);
+    --red: #e05555;
+    --red-dim: rgba(224, 85, 85, 0.15);
+    --yellow: #e0c955;
+    --text-primary: #f0f5f1;
+    --text-secondary: #94a898;
+    --text-dim: #5a6d5e;
+    --bolt-green: #34d186;
+    --glovo-yellow: #ffc244;
+    --wolt-blue: #009de0;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: 'Inter', -apple-system, sans-serif;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  .noise {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .orb {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(120px);
+    opacity: 0.15;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .orb-1 { width: 600px; height: 600px; background: #0d4a25; top: -200px; left: -100px; }
+  .orb-2 { width: 500px; height: 500px; background: #0d3a3a; bottom: 200px; right: -100px; }
+  .orb-3 { width: 400px; height: 400px; background: #1a4a20; top: 50%; left: 40%; }
+
+  .container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 40px 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* HEADER */
+  .header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+  .header .tag {
+    display: inline-block;
+    background: rgba(70, 210, 122, 0.1);
+    border: 1px solid rgba(70, 210, 122, 0.25);
+    color: var(--green-primary);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 6px 16px;
+    border-radius: 100px;
+    margin-bottom: 20px;
+  }
+  .header h1 {
+    font-size: 42px;
+    font-weight: 800;
+    line-height: 1.15;
+    margin-bottom: 12px;
+    background: linear-gradient(135deg, #fff 0%, #94a898 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .header h1 span {
+    background: linear-gradient(135deg, var(--green-primary) 0%, #2a7d48 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .header .subtitle {
+    font-size: 18px;
+    color: var(--text-secondary);
+    max-width: 680px;
+    margin: 0 auto 24px;
+  }
+  .header .author {
+    font-size: 13px;
+    color: var(--text-dim);
+  }
+  .header .author a {
+    color: var(--green-primary);
+    text-decoration: none;
+  }
+
+  /* KPI STRIP */
+  .kpi-strip {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 40px;
+  }
+  .kpi-card {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    padding: 24px;
+    text-align: center;
+    transition: all 0.2s;
+  }
+  .kpi-card:hover {
+    background: var(--card-hover);
+    border-color: var(--green-dim);
+  }
+  .kpi-value {
+    font-size: 36px;
+    font-weight: 800;
+    margin-bottom: 4px;
+  }
+  .kpi-value.green { color: var(--green-primary); }
+  .kpi-value.red { color: var(--red); }
+  .kpi-value.yellow { color: var(--yellow); }
+  .kpi-value.white { color: #fff; }
+  .kpi-label {
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+  .kpi-sublabel {
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 4px;
+  }
+
+  /* SECTION */
+  .section {
+    margin-bottom: 40px;
+  }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .section-number {
+    background: rgba(70, 210, 122, 0.12);
+    color: var(--green-primary);
+    font-size: 14px;
+    font-weight: 700;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .section-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  /* CARDS */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    padding: 32px;
+    transition: all 0.2s;
+  }
+  .card:hover {
+    border-color: var(--green-dim);
+  }
+
+  .chart-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .chart-card {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    padding: 24px;
+  }
+  .chart-card h3 {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 16px;
+  }
+  .chart-container {
+    position: relative;
+    height: 280px;
+  }
+
+  /* TIMELINE */
+  .timeline {
+    position: relative;
+    padding-left: 40px;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 15px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--green-primary), var(--red));
+  }
+  .timeline-item {
+    position: relative;
+    margin-bottom: 28px;
+  }
+  .timeline-item:last-child { margin-bottom: 0; }
+  .timeline-dot {
+    position: absolute;
+    left: -33px;
+    top: 4px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid;
+  }
+  .timeline-dot.green { border-color: var(--green-primary); background: rgba(70, 210, 122, 0.3); }
+  .timeline-dot.yellow { border-color: var(--yellow); background: rgba(224, 201, 85, 0.3); }
+  .timeline-dot.red { border-color: var(--red); background: rgba(224, 85, 85, 0.3); }
+  .timeline-date {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .timeline-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+  .timeline-desc {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+
+  /* FAILURE FACTORS */
+  .factor-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .factor-card {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    padding: 24px;
+    transition: all 0.2s;
+  }
+  .factor-card:hover {
+    border-color: var(--red);
+    background: var(--red-dim);
+  }
+  .factor-icon {
+    font-size: 28px;
+    margin-bottom: 12px;
+  }
+  .factor-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+  .factor-desc {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+  .factor-stat {
+    display: inline-block;
+    margin-top: 10px;
+    background: rgba(224, 85, 85, 0.12);
+    color: var(--red);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 6px;
+  }
+
+  /* ECOSYSTEM SPLIT */
+  .eco-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+  }
+  .eco-card {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    padding: 24px;
+    text-align: center;
+  }
+  .eco-card.alive {
+    border-color: var(--green-dim);
+  }
+  .eco-card.dead {
+    border-color: rgba(224, 85, 85, 0.3);
+  }
+  .eco-status {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 100px;
+    margin-bottom: 12px;
+  }
+  .eco-status.alive {
+    background: rgba(70, 210, 122, 0.12);
+    color: var(--green-primary);
+  }
+  .eco-status.dead {
+    background: rgba(224, 85, 85, 0.12);
+    color: var(--red);
+  }
+  .eco-name {
+    font-size: 20px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+  .eco-desc {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-bottom: 12px;
+  }
+  .eco-metric {
+    font-size: 13px;
+    color: var(--text-dim);
+    margin-top: 4px;
+  }
+  .eco-metric strong {
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+
+  /* INSIGHT BOX */
+  .insight-box {
+    background: linear-gradient(135deg, rgba(70, 210, 122, 0.06) 0%, rgba(70, 210, 122, 0.02) 100%);
+    border: 1px solid rgba(70, 210, 122, 0.2);
+    border-radius: 14px;
+    padding: 28px 32px;
+    margin-top: 40px;
+  }
+  .insight-box h3 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--green-primary);
+    margin-bottom: 10px;
+  }
+  .insight-box p {
+    font-size: 15px;
+    color: var(--text-secondary);
+    line-height: 1.7;
+  }
+
+  /* FOOTER */
+  .footer {
+    text-align: center;
+    margin-top: 60px;
+    padding-top: 24px;
+    border-top: 1px solid var(--card-border);
+    font-size: 13px;
+    color: var(--text-dim);
+  }
+  .footer a {
+    color: var(--green-primary);
+    text-decoration: none;
+  }
+
+  /* TAB FILTER */
+  .tab-bar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+  .tab-btn {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    color: var(--text-secondary);
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 8px 18px;
+    border-radius: 100px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .tab-btn:hover {
+    border-color: var(--green-dim);
+    color: var(--text-primary);
+  }
+  .tab-btn.active {
+    background: rgba(70, 210, 122, 0.12);
+    border-color: var(--green-primary);
+    color: var(--green-primary);
+  }
+
+  @media (max-width: 768px) {
+    .kpi-strip { grid-template-columns: repeat(2, 1fr); }
+    .chart-grid { grid-template-columns: 1fr; }
+    .factor-grid { grid-template-columns: 1fr; }
+    .eco-grid { grid-template-columns: 1fr; }
+    .header h1 { font-size: 28px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="noise"></div>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="tag">Market Analysis</div>
+    <h1>Bolt Food Died in Croatia.<br><span>Bolt Rides Is Thriving.</span></h1>
+    <p class="subtitle">Same brand, same market, opposite outcomes. A data-driven breakdown of why Bolt's food delivery collapsed while its ride-hailing dominates.</p>
+    <p class="author">By <a href="https://www.linkedin.com/in/david-mustac/" target="_blank">David Mustac</a> &middot; March 2026</p>
+  </div>
+
+  <!-- KPI STRIP -->
+  <div class="kpi-strip">
+    <div class="kpi-card">
+      <div class="kpi-value red">&euro;2.73M</div>
+      <div class="kpi-label">Bolt Food Revenue 2024</div>
+      <div class="kpi-sublabel">Down 40% from 2022 peak</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-value green">&euro;22.32M</div>
+      <div class="kpi-label">Glovo Revenue 2024</div>
+      <div class="kpi-sublabel">Market leader &middot; 8.2x Bolt</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-value yellow">5 years</div>
+      <div class="kpi-label">Bolt Food Lifespan</div>
+      <div class="kpi-sublabel">May 2020 &rarr; Oct 2025</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-value white">#1</div>
+      <div class="kpi-label">Bolt Rides Position</div>
+      <div class="kpi-sublabel">Market leader in ride-hailing</div>
+    </div>
+  </div>
+
+  <!-- SECTION 1: REVENUE COMPARISON -->
+  <div class="section" id="section-revenue">
+    <div class="section-header">
+      <div class="section-number">1</div>
+      <h2 class="section-title">Revenue Comparison: The Gap Was Unbridgeable</h2>
+    </div>
+
+    <div class="chart-grid">
+      <div class="chart-card">
+        <h3>Croatia Food Delivery Revenue (&euro;M)</h3>
+        <div class="chart-container">
+          <canvas id="revenueChart"></canvas>
+        </div>
+      </div>
+      <div class="chart-card">
+        <h3>2024 Market Share by Revenue</h3>
+        <div class="chart-container">
+          <canvas id="marketShareChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 2: BOLT ECOSYSTEM SPLIT -->
+  <div class="section" id="section-ecosystem">
+    <div class="section-header">
+      <div class="section-number">2</div>
+      <h2 class="section-title">Bolt Ecosystem: What Survived vs What Died</h2>
+    </div>
+
+    <div class="eco-grid">
+      <div class="eco-card dead">
+        <div class="eco-status dead">Exited Oct 2025</div>
+        <div class="eco-name">Bolt Food</div>
+        <div class="eco-desc">Food & grocery delivery</div>
+        <div class="eco-metric">Peak revenue: <strong>&euro;4.53M</strong> (2022)</div>
+        <div class="eco-metric">Final revenue: <strong>&euro;2.73M</strong> (2024)</div>
+        <div class="eco-metric">Market share: <strong>7.0%</strong></div>
+        <div class="eco-metric">Was profitable: <strong>Yes, all 3 years (&euro;121K in 2024)</strong></div>
+      </div>
+      <div class="eco-card alive">
+        <div class="eco-status alive">Active &middot; Market Leader</div>
+        <div class="eco-name">Bolt Rides</div>
+        <div class="eco-desc">On-demand ride-hailing</div>
+        <div class="eco-metric">Position: <strong>#1 in Croatia</strong></div>
+        <div class="eco-metric">Global rides rev: <strong>&euro;1.63B</strong></div>
+        <div class="eco-metric">Revenue share: <strong>82% of Bolt</strong></div>
+        <div class="eco-metric">Status: <strong>Dominant</strong></div>
+      </div>
+      <div class="eco-card alive">
+        <div class="eco-status alive">Active</div>
+        <div class="eco-name">Bolt Scooters</div>
+        <div class="eco-desc">Electric scooter rentals</div>
+        <div class="eco-metric">Global e-scooter rev: <strong>&euro;150M</strong></div>
+        <div class="eco-metric">Segment: <strong>Micromobility</strong></div>
+        <div class="eco-metric">Croatia cities: <strong>Zagreb, Split</strong></div>
+        <div class="eco-metric">Status: <strong>Growing</strong></div>
+      </div>
+    </div>
+
+    <div style="margin-top: 20px;">
+      <div class="chart-card">
+        <h3>Bolt Global Revenue by Segment (2024)</h3>
+        <div class="chart-container" style="height: 260px;">
+          <canvas id="ecosystemChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 3: TIMELINE -->
+  <div class="section" id="section-timeline">
+    <div class="section-header">
+      <div class="section-number">3</div>
+      <h2 class="section-title">Timeline: Rise, Peak, Decline, Exit</h2>
+    </div>
+
+    <div class="card">
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-dot green"></div>
+          <div class="timeline-date">2018</div>
+          <div class="timeline-title">Wolt enters Croatia</div>
+          <div class="timeline-desc">First major food delivery platform in the market. Establishes operations in Zagreb.</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot green"></div>
+          <div class="timeline-date">2019</div>
+          <div class="timeline-title">Glovo launches in Zagreb & Split</div>
+          <div class="timeline-desc">Spanish delivery giant enters Croatia. Aggressive expansion across multiple cities.</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot green"></div>
+          <div class="timeline-date">May 2020</div>
+          <div class="timeline-title">Bolt Food launches in Zagreb</div>
+          <div class="timeline-desc">Enters during COVID-19 surge in delivery demand. Leverages existing Bolt Rides user base.</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot green"></div>
+          <div class="timeline-date">Dec 2021</div>
+          <div class="timeline-title">Bolt Food expands to Osijek</div>
+          <div class="timeline-desc">Expands beyond Zagreb to Croatia's 4th largest city. Wolt acquired by DoorDash for &euro;7B.</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot green"></div>
+          <div class="timeline-date">2022</div>
+          <div class="timeline-title">Peak year: &euro;4.53M revenue, &euro;177K profit</div>
+          <div class="timeline-desc">Bolt Food hits its Croatian revenue peak. Expands to Split. Three-way battle fully active.</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot yellow"></div>
+          <div class="timeline-date">2023</div>
+          <div class="timeline-title">Revenue crashes 51% to &euro;2.23M</div>
+          <div class="timeline-desc">Post-COVID normalization. Customer acquisition costs erode margins. Profit drops to &euro;93K from &euro;177K.</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot yellow"></div>
+          <div class="timeline-date">2024</div>
+          <div class="timeline-title">Slight recovery to &euro;2.73M, still profitable</div>
+          <div class="timeline-desc">Profit at &euro;121K. But gap with Glovo (&euro;22.3M) and Wolt (&euro;14.2M) is now 8x and 5x. Unsustainable position.</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot red"></div>
+          <div class="timeline-date">Sep 2025</div>
+          <div class="timeline-title">Bolt announces Croatia Food exit</div>
+          <div class="timeline-desc">Cites "business reasons." Confirms Rides and Scooters stay. Final orders accepted until Oct 6.</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot red"></div>
+          <div class="timeline-date">Oct 6, 2025</div>
+          <div class="timeline-title">Bolt Food goes dark</div>
+          <div class="timeline-desc">Last orders processed. Croatian food delivery becomes a Glovo vs Wolt duopoly. Bolt Rides remains #1.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 4: WHY IT FAILED -->
+  <div class="section" id="section-failure">
+    <div class="section-header">
+      <div class="section-number">4</div>
+      <h2 class="section-title">Why Bolt Food Failed: 4 Structural Problems</h2>
+    </div>
+
+    <div class="factor-grid">
+      <div class="factor-card">
+        <div class="factor-icon">&#128200;</div>
+        <div class="factor-title">Late Mover in a 3-Player Market</div>
+        <div class="factor-desc">Entered in 2020, two years after Wolt and one year after Glovo. By the time Bolt Food launched, competitors had locked in restaurant partnerships and delivery networks. Croatia's 3.8M population couldn't sustain three platforms.</div>
+        <div class="factor-stat">2 years late to market</div>
+      </div>
+      <div class="factor-card">
+        <div class="factor-icon">&#128176;</div>
+        <div class="factor-title">Unsustainable Customer Acquisition</div>
+        <div class="factor-desc">Aggressive discounts and loyalty programs to win users from Glovo/Wolt burned through capital. Price-sensitive Croatian consumers would switch platforms for the best deal, making retention nearly impossible.</div>
+        <div class="factor-stat">Revenue halved 2022&rarr;2023</div>
+      </div>
+      <div class="factor-card">
+        <div class="factor-icon">&#127869;</div>
+        <div class="factor-title">Thin Restaurant Density</div>
+        <div class="factor-desc">Glovo and Wolt had exclusive partnerships with top restaurants. Bolt Food's catalog was thinner, especially outside Zagreb. Fewer choices meant fewer orders, creating a death spiral of declining merchant interest.</div>
+        <div class="factor-stat">Only 3 cities vs competitors' broader reach</div>
+      </div>
+      <div class="factor-card">
+        <div class="factor-icon">&#9989;</div>
+        <div class="factor-title">Profitable But Strategically Irrelevant</div>
+        <div class="factor-desc">The paradox: Bolt Food was the ONLY profitable delivery platform in Croatia (&euro;118K in 2024). But 7% market share with no growth path made it a distraction from Bolt's core ride-hailing business which generates &euro;1.6B+ globally.</div>
+        <div class="factor-stat">&euro;121K profit on &euro;2.73M revenue</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROFITABILITY CHART -->
+  <div class="section">
+    <div class="chart-grid">
+      <div class="chart-card">
+        <h3>Bolt Food Croatia: Revenue vs Profit (&euro;)</h3>
+        <div class="chart-container">
+          <canvas id="profitChart"></canvas>
+        </div>
+      </div>
+      <div class="chart-card">
+        <h3>2024 Profitability: The Irony</h3>
+        <div class="chart-container">
+          <canvas id="profitabilityChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- INSIGHT BOX -->
+  <div class="insight-box">
+    <h3>Key Takeaway</h3>
+    <p>Bolt Food didn't fail because it was unprofitable — it was profitable all three years of reported data (&euro;177K in 2022, &euro;93K in 2023, &euro;121K in 2024). It failed because profitability at &euro;2.73M revenue with 7% market share is a dead end. Bolt made a rational capital allocation decision: redirect resources from a structurally unwinnable food delivery market to ride-hailing where they're #1. The lesson for small EU markets: being profitable isn't enough if you can't grow. Three-player markets with 3.8M people will always consolidate to two.</p>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <p>Data sourced from Croatian Company Registry (CompanyWall.hr) &middot; Entities: Bolt Services HR d.o.o., GlovoApp Technology d.o.o., Wolt Zagreb d.o.o.</p>
+    <p style="margin-top: 8px;">Built by <a href="https://www.linkedin.com/in/david-mustac/" target="_blank">David Mustac</a> &middot; March 2026</p>
+  </div>
+
+</div>
+
+<script>
+  // Chart.js defaults
+  Chart.defaults.color = '#94a898';
+  Chart.defaults.borderColor = 'rgba(30, 51, 34, 0.5)';
+  Chart.defaults.font.family = "'Inter', sans-serif";
+
+  // 1. REVENUE COMPARISON BAR CHART
+  new Chart(document.getElementById('revenueChart'), {
+    type: 'bar',
+    data: {
+      labels: ['2022', '2023', '2024'],
+      datasets: [
+        {
+          label: 'Bolt Food',
+          data: [4.53, 2.23, 2.73],
+          backgroundColor: '#34d186',
+          borderRadius: 6,
+          barPercentage: 0.7,
+        },
+        {
+          label: 'Wolt',
+          data: [16.80, 10.28, 14.16],
+          backgroundColor: '#009de0',
+          borderRadius: 6,
+          barPercentage: 0.7,
+        },
+        {
+          label: 'Glovo',
+          data: [14.64, 17.63, 22.32],
+          backgroundColor: '#ffc244',
+          borderRadius: 6,
+          barPercentage: 0.7,
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { usePointStyle: true, pointStyle: 'circle', padding: 20, font: { size: 12 } }
+        },
+        tooltip: {
+          callbacks: {
+            label: (ctx) => `${ctx.dataset.label}: €${ctx.parsed.y}M`
+          }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: { callback: v => `€${v}M` },
+          grid: { color: 'rgba(30, 51, 34, 0.3)' }
+        },
+        x: {
+          grid: { display: false }
+        }
+      }
+    }
+  });
+
+  // 2. MARKET SHARE DOUGHNUT
+  new Chart(document.getElementById('marketShareChart'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Glovo (€22.32M)', 'Wolt (€14.16M)', 'Bolt Food (€2.73M)'],
+      datasets: [{
+        data: [22.32, 14.16, 2.73],
+        backgroundColor: ['#ffc244', '#009de0', '#34d186'],
+        borderWidth: 0,
+        hoverOffset: 8
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '65%',
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { usePointStyle: true, pointStyle: 'circle', padding: 16, font: { size: 12 } }
+        },
+        tooltip: {
+          callbacks: {
+            label: (ctx) => {
+              const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+              const pct = ((ctx.parsed / total) * 100).toFixed(1);
+              return `${ctx.label}: ${pct}%`;
+            }
+          }
+        }
+      }
+    }
+  });
+
+  // 3. ECOSYSTEM CHART
+  new Chart(document.getElementById('ecosystemChart'), {
+    type: 'bar',
+    data: {
+      labels: ['Ride-Hailing', 'Food & Grocery', 'Scooters/Micro'],
+      datasets: [{
+        label: 'Revenue (€M)',
+        data: [1634, 185, 150],
+        backgroundColor: ['#34d186', '#e05555', '#46d27a'],
+        borderRadius: 8,
+        barPercentage: 0.5,
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: (ctx) => `€${ctx.parsed.x}M`
+          }
+        }
+      },
+      scales: {
+        x: {
+          beginAtZero: true,
+          ticks: { callback: v => `€${v}M` },
+          grid: { color: 'rgba(30, 51, 34, 0.3)' }
+        },
+        y: {
+          grid: { display: false },
+          ticks: { font: { size: 13, weight: '600' } }
+        }
+      }
+    }
+  });
+
+  // 4. BOLT FOOD REVENUE VS PROFIT
+  new Chart(document.getElementById('profitChart'), {
+    type: 'bar',
+    data: {
+      labels: ['2022', '2023', '2024'],
+      datasets: [
+        {
+          label: 'Revenue (€M)',
+          data: [4533446, 2228122, 2725093],
+          backgroundColor: 'rgba(52, 209, 134, 0.3)',
+          borderColor: '#34d186',
+          borderWidth: 2,
+          borderRadius: 6,
+          yAxisID: 'y',
+        },
+        {
+          label: 'Net Profit (€)',
+          data: [176585, 93363, 121296],
+          type: 'line',
+          borderColor: '#ffc244',
+          backgroundColor: '#ffc244',
+          pointRadius: 6,
+          pointHoverRadius: 8,
+          borderWidth: 3,
+          yAxisID: 'y1',
+          tension: 0.3,
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { usePointStyle: true, pointStyle: 'circle', padding: 20, font: { size: 12 } }
+        },
+        tooltip: {
+          callbacks: {
+            label: (ctx) => {
+              if (ctx.datasetIndex === 0) return `Revenue: €${(ctx.parsed.y / 1000000).toFixed(2)}M`;
+              return `Profit: €${ctx.parsed.y.toLocaleString()}`;
+            }
+          }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          position: 'left',
+          ticks: { callback: v => `€${(v / 1000000).toFixed(1)}M` },
+          grid: { color: 'rgba(30, 51, 34, 0.3)' }
+        },
+        y1: {
+          position: 'right',
+          ticks: { callback: v => `€${(v / 1000).toFixed(0)}K` },
+          grid: { display: false }
+        },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+
+  // 5. PROFITABILITY COMPARISON
+  new Chart(document.getElementById('profitabilityChart'), {
+    type: 'bar',
+    data: {
+      labels: ['Bolt Food', 'Wolt', 'Glovo'],
+      datasets: [{
+        label: 'Net Profit/Loss 2024 (€)',
+        data: [121296, 420146, -7359601],
+        backgroundColor: ['#34d186', '#009de0', '#e05555'],
+        borderRadius: 8,
+        barPercentage: 0.5,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: (ctx) => {
+              const v = ctx.parsed.y;
+              if (Math.abs(v) >= 1000000) return `€${(v / 1000000).toFixed(1)}M`;
+              return `€${(v / 1000).toFixed(0)}K`;
+            }
+          }
+        }
+      },
+      scales: {
+        y: {
+          ticks: {
+            callback: v => {
+              if (Math.abs(v) >= 1000000) return `€${(v / 1000000).toFixed(0)}M`;
+              return `€${(v / 1000).toFixed(0)}K`;
+            }
+          },
+          grid: { color: 'rgba(30, 51, 34, 0.3)' }
+        },
+        x: {
+          grid: { display: false },
+          ticks: { font: { size: 13, weight: '600' } }
+        }
+      }
+    }
+  });
+</script>
+
+</body>
+</html>
